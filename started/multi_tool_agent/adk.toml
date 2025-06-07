@@ -1,0 +1,7 @@
+[app]
+name = "multi_tool_agent"
+description = "LLM Agent with multiple tools"
+agent_class = "LLMAgent"
+
+[dependencies]
+python_version = ">=3.8"
