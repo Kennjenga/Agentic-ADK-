@@ -72,22 +72,18 @@ async def calculator(expression: str) -> str:
 # --- Root Agent Definition ---
 # This is the agent instance that ADK will load and run.
 root_agent = Agent(
-    model="gemini-2.0-flash-001", # As per your example
+    model="gemini-2.0-flash", # As per your example
     name="utility_query_agent", # A descriptive name for this agent
     description="An AI assistant that uses tools to provide weather information and perform calculations.",
     instruction=multi_tool_agent_instruction, # Using the imported instruction
     tools=[
         FunctionTool(
-            func=get_weather,
-            # name="get_weather", # Optional: ADK infers from func.__name__
-            # description is taken from the function's docstring if not provided here.
-            # Providing an explicit description can sometimes offer more control.
-            description="Provides the current weather conditions for a specified city or geographical location."
+            func=get_weather
+            # The description will be taken from the get_weather function's docstring.
         ),
         FunctionTool(
-            func=calculator,
-            # name="calculator", # Optional: ADK infers from func.__name__
-            description="Computes the result of a given mathematical expression. Supports basic arithmetic operations."
+            func=calculator
+            # The description will be taken from the calculator function's docstring.
         ),
     ],
 )
