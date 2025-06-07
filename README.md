@@ -40,20 +40,11 @@ The Agent Development Kit (ADK) is a flexible, modular framework for building an
     ```bash
     pip install google-adk
     ```
-- **Resources:**  
-    - [Quickstart Tutorials](https://google.github.io/adk-docs/)
-    - [Sample Agents](https://google.github.io/adk-docs/)
-    - [API Reference](https://google.github.io/adk-docs/)
-    - [Contribute](https://google.github.io/adk-docs/)
 
 ---
 
 ## Learn More
 
 - [Official Documentation](https://google.github.io/adk-docs/)
-- [Introducing Agent Development Kit (Video)](https://google.github.io/adk-docs/)
 
 ---
-
-© Google 2025  
-Made with Material for MkDocs
