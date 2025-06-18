@@ -14,6 +14,8 @@
 
 import asyncio
 import json
+import aiohttp
+import os
 
 from google.adk.agents import Agent
 from google.adk.tools import FunctionTool
@@ -27,23 +29,60 @@ from .prompt import multi_tool_agent_instruction
 
 async def get_weather(location: str) -> str:
     """
-    Retrieves the current weather information for a specified location.
+    Retrieves the current weather information for a specified location using live data.
     Args:
         location (str): The city or area (e.g., "London", "New York, NY").
     Returns:
         str: A JSON string containing weather data like temperature and condition.
     """
-    # Simulate an API call
-    await asyncio.sleep(0.1)
     print(f"DEBUG: Tool 'get_weather' called with location: {location}")
-    # Example data; a real implementation would query a weather service
-    if "london" in location.lower():
-        data = {"location": location, "temperature": "15°C", "condition": "Cloudy"}
-    elif "paris" in location.lower():
-        data = {"location": location, "temperature": "18°C", "condition": "Sunny"}
-    else:
-        data = {"location": location, "temperature": "22°C", "condition": "Partly Cloudy", "details": "Sample data"}
-    return json.dumps(data)
+    
+    # Get API key from environment variable
+    api_key = os.getenv('OPENWEATHER_API_KEY')
+    if not api_key:
+        return json.dumps({
+            "location": location, 
+            "error": "Weather API key not configured. Please set OPENWEATHER_API_KEY environment variable."
+        })
+    
+    try:
+        # Use OpenWeatherMap API for live weather data
+        async with aiohttp.ClientSession() as session:
+            url = f"http://api.openweathermap.org/data/2.5/weather"
+            params = {
+                "q": location,
+                "appid": api_key,
+                "units": "metric"  # For Celsius
+            }
+            
+            async with session.get(url, params=params) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    weather_data = {
+                        "location": f"{data['name']}, {data['sys']['country']}",
+                        "temperature": f"{data['main']['temp']}°C",
+                        "condition": data['weather'][0]['description'].title(),
+                        "humidity": f"{data['main']['humidity']}%",
+                        "wind_speed": f"{data['wind']['speed']} m/s"
+                    }
+                    return json.dumps(weather_data)
+                else:
+                    error_data = await response.json()
+                    return json.dumps({
+                        "location": location,
+                        "error": f"Weather data not found: {error_data.get('message', 'Unknown error')}"
+                    })
+    except Exception as e:
+        return json.dumps({
+            "location": location,
+            "error": f"Failed to fetch weather data: {str(e)}"
+        })
+                    
+    except Exception as e:
+        return json.dumps({
+            "location": location,
+            "error": f"Failed to fetch weather data: {str(e)}"
+        })
 
 async def calculator(expression: str) -> str:
     """
